@@ -6,16 +6,19 @@
   Recipes.Search = {};
 
   Recipes.Search.init = function() {
-    var search, timerId;
+    var search, timerId, listener;
     timerId = null;
     search = document.querySelector('form.search input');
-    return search.addEventListener('keyup', function() {
+    listener = function() {
       if (timerId !== null) {
         clearTimeout(timerId);
         timerId = null;
       }
       return timerId = setTimeout(Recipes.Search.doSearch, 300, search.value);
-    });
+    };
+    search.addEventListener('keyup', listener);
+    search.addEventListener('change', listener);
+    search.addEventListener('search', listener);
   };
 
   Recipes.Search.doSearch = function(q) {

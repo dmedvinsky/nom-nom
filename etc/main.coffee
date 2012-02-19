@@ -3,11 +3,13 @@ Recipes.Search = {}
 Recipes.Search.init = () ->
     timerId = null
     search = document.querySelector 'form.search input'
-    search.addEventListener 'keyup', () ->
+    listener = () ->
         if timerId isnt null
             clearTimeout timerId
             timerId = null
         timerId = setTimeout Recipes.Search.doSearch, 300, search.value
+    (search.addEventListener e, listener for e in ['keyup', 'change', 'search'])
+    undefined
 Recipes.Search.doSearch = (q) ->
     q = q.trim()
     lis = document.querySelectorAll '.recipe-list li'
