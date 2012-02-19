@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-test -f "./.recipes.txt" || (echo Not a recipes.; exit 1) || exit 1
+test -f "./.recipes.txt" || (echo "Please run from recipes root directory"; exit 1) || exit 1
 
-MARKDOWN="./lib/markdown.pl"
-TEMPLATE="$(cat './etc/layout.html')"
 
 paths=()
 titles=()
 
+
+markdown() {
+    ./lib/markdown.pl "$@"
+}
 template() {
+    local template="$(cat './etc/layout.html')"
     local title="$1"
     local content="$2"
     local dst="$3"
     echo "${content}" > "${dst}.tmp"
-    echo "${TEMPLATE}" \
+    echo "${template}" \
         | sed -r \
             -e "s=\{\{ title \}\}=${title}=" \
             -e "/\{\{ content \}\}/r ${dst}.tmp" \
@@ -25,7 +28,7 @@ process_file() {
     local src=$1
     local dst=$(echo "$src" | sed -re 's|src/|var/|; s/\.markdown$/.html/')
 
-    local content=$(${MARKDOWN} "${src}")
+    local content=$(markdown "${src}")
     local title=$(echo "${content}" | grep '<h1>' -m1 | sed -re 's|<h1>(.+)</h1>|\1|')
 
     paths=("${paths[@]}" "$dst")
@@ -33,7 +36,6 @@ process_file() {
 
     template "${title}" "${content}" "${dst}"
 }
-
 create_index() {
     local src=./src/index.markdown
     local dst=./var/index.html
@@ -45,13 +47,27 @@ create_index() {
         local item="* [${title}](${path})"
         echo "${item}" >> "${src}"
     done
-    local content=$("${MARKDOWN}" "${src}")
+    local content=$(markdown "${src}")
     template "Recipes" "${content}" "${dst}"
 }
+clean() {
+    rm -f ./src/index.markdown
+    rm -f ./var/*.html
+}
+build() {
+    for f in ./src/*.markdown; do
+        process_file "${f}"
+    done
+    create_index
+}
 
-rm -f ./src/index.markdown
-rm -f ./var/*.html
-for f in ./src/*.markdown; do
-    process_file "${f}"
-done
-create_index
+
+case $1 in
+    clean)
+        clean
+        ;;
+    *)
+        clean
+        build
+        ;;
+esac
