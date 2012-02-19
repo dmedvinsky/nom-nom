@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+test -f "./.recipes.txt" || (echo Not a recipes.; exit 1) || exit 1
+
+MARKDOWN="./lib/markdown.pl"
+TEMPLATE="$(cat './etc/layout.html')"
+
+paths=()
+titles=()
+
+template() {
+    local title="$1"
+    local content="$2"
+    local dst="$3"
+    echo "${content}" > "${dst}.tmp"
+    echo "${TEMPLATE}" \
+        | sed -r \
+            -e "s=\{\{ title \}\}=${title}=" \
+            -e "/\{\{ content \}\}/r ${dst}.tmp" \
+            -e "/\{\{ content \}\}/d" \
+        > "${dst}"
+    rm "${dst}.tmp"
+}
+
+process_file() {
+    local src=$1
+    local dst=$(echo "$src" | sed -re 's|src/|var/|; s/\.markdown$/.html/')
+
+    local content=$(${MARKDOWN} "${src}")
+    local title=$(echo "${content}" | grep '<h1>' -m1 | sed -re 's|<h1>(.+)</h1>|\1|')
+
+    paths=("${paths[@]}" "$dst")
+    titles=("${titles[@]}" "$title")
+
+    template "${title}" "${content}" "${dst}"
+}
+
+create_index() {
+    local src=./src/index.markdown
+    local dst=./var/index.html
+
+    local len=${#titles[@]}
+    for (( i = 0; i < len; i++ )); do
+        local path=${paths[$i]/.\/var\//}
+        local title=${titles[$i]}
+        local item="* [${title}](${path})"
+        echo "${item}" >> "${src}"
+    done
+    local content=$("${MARKDOWN}" "${src}")
+    template "Recipes" "${content}" "${dst}"
+}
+
+rm -f ./src/index.markdown
+rm -f ./var/*.html
+for f in ./src/*.markdown; do
+    process_file "${f}"
+done
+create_index
