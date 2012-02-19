@@ -1,6 +1,8 @@
 recipes:
 	./bin/compile
 
+all: recipes css js
+
 assets: css js
 
 css:
