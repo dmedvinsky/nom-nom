@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+    <script src="main.js"></script>
+    <title>Recipes</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Recipes</h1>
+    </header>
+
+    <nav class="site-nav">
+      <form class="search" method="get" action="." id="id-search-form">
+        <fieldset>
+          <input type="search" placeholder="Search">
+        </fieldset>
+      </form>
+    </nav>
+
+    <section class="recipe-list">
+      {{ content }}
+    </section>
+
+    <script>Recipes.Search.init();</script>
+  </body>
+</html>

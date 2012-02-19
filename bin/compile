@@ -10,10 +10,11 @@ markdown() {
     ./lib/markdown.pl "$@"
 }
 template() {
-    local template="$(cat './etc/layout.html')"
-    local title="$1"
-    local content="$2"
-    local dst="$3"
+    local templatePath="$1"
+    local title="$2"
+    local content="$3"
+    local dst="$4"
+    local template="$(cat "${templatePath}")"
     echo "${content}" > "${dst}.tmp"
     echo "${template}" \
         | sed -r \
@@ -23,7 +24,6 @@ template() {
         > "${dst}"
     rm "${dst}.tmp"
 }
-
 process_file() {
     local src=$1
     local dst=$(echo "$src" | sed -re 's|src/|var/|; s/\.markdown$/.html/')
@@ -34,9 +34,15 @@ process_file() {
     paths=("${paths[@]}" "$dst")
     titles=("${titles[@]}" "$title")
 
-    template "${title}" "${content}" "${dst}"
+    template "./etc/recipe.html" "${title}" "${content}" "${dst}"
 }
-create_index() {
+
+make_recipes() {
+    for f in ./src/*.markdown; do
+        process_file "${f}"
+    done
+}
+make_index() {
     local src=./src/index.markdown
     local dst=./var/index.html
 
@@ -48,17 +54,16 @@ create_index() {
         echo "${item}" >> "${src}"
     done
     local content=$(markdown "${src}")
-    template "Recipes" "${content}" "${dst}"
+    template "./etc/index.html" "" "${content}" "${dst}"
 }
+
 clean() {
     rm -f ./src/index.markdown
     rm -f ./var/*.html
 }
 build() {
-    for f in ./src/*.markdown; do
-        process_file "${f}"
-    done
-    create_index
+    make_recipes
+    make_index
 }
 
 
