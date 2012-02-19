@@ -56,6 +56,18 @@ make_index() {
     local content=$(markdown "${src}")
     template "./etc/index.html" "" "${content}" "${dst}"
 }
+make_css() {
+    local src=./etc/main.sass
+    local dst=./var/main.css
+
+    sass --unix-newlines --style compressed "${src}":"${dst}"
+}
+make_js() {
+    local src=./etc/main.coffee
+    local dst=./var/
+
+    coffee --output "${dst}" "${src}"
+}
 
 clean() {
     rm -f ./src/index.markdown
@@ -70,6 +82,12 @@ build() {
 case $1 in
     clean)
         clean
+        ;;
+    css)
+        make_css
+        ;;
+    js)
+        make_js
         ;;
     *)
         clean

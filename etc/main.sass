@@ -1,0 +1,75 @@
+@mixin box-sizing($x)
+    -webkit-box-sizing: $x
+    -moz-box-sizing: $x
+    -ms-box-sizing: $x
+    box-sizing: $x
+@mixin transition($x)
+    -webkit-transition: $x
+    -moz-transition: $x
+    -ms-transition: $x
+    transition: $x
+
+@mixin main-block()
+    background: #fff
+    border: 1px solid #aaa
+    width: 500px
+    margin: 1em auto
+    padding: 0
+
+
+*
+    @include box-sizing(border-box)
+
+.hidden
+    display: none
+
+body
+    background: #f0f0f0
+
+a
+    &:link
+        color: blue
+    &:visited
+        color: darken(blue, 30%)
+    &:hover
+        color: red
+    &:active
+        color: lighten(red, 30%)
+
+.site-header
+    @include main-block()
+    h1
+        width: 100%
+        text-align: center
+        font-family: Ubuntu, Calibri, sans
+
+.site-nav
+    @include main-block()
+    height: 50px
+    ul
+        list-style: none
+        margin: 0
+        li
+            display: inline-block
+            line-height: 50px
+    form
+        margin: 0
+        padding: 0
+    fieldset
+        border: none
+        margin: 0
+        padding: 10px
+    input
+        width: 100%
+        height: 30px
+        line-height: 30px
+
+.recipe-list
+    @include main-block()
+    li
+        @include transition(display 0.3s)
+
+.recipe
+    @include main-block()
+    padding: 0 1em
+
