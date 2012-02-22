@@ -7,7 +7,9 @@
   Recipes.Search = {};
 
   Recipes.Search.init = function() {
-    this.lis = document.querySelectorAll('.recipe-list li');
+    this._lis = document.querySelectorAll('.recipe-list > ul > li');
+    this._query = '';
+    this._tag = '';
     this.initSearchField();
     this.initTagsFilter();
     return;
@@ -22,7 +24,10 @@
         clearTimeout(timerId);
         timerId = null;
       }
-      return timerId = setTimeout(Recipes.Search.onSearchQuery, 300, search.value);
+      return timerId = setTimeout(function() {
+        Recipes.Search._query = search.value;
+        return Recipes.Search.filter();
+      }, 300);
     };
     _ref = ['keyup', 'change', 'search'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -57,24 +62,20 @@
       show(tagsContainer);
     }
     tagsSelect.addEventListener('change', function() {
-      return Recipes.Search.onTagSelect(tagsSelect.value);
+      Recipes.Search._tag = tagsSelect.value;
+      return Recipes.Search.filter();
     });
     return;
   };
 
-  Recipes.Search.onSearchQuery = function(q) {
-    var match;
-    match = function(x, node) {
-      var xs;
-      xs = node.textContent.toLowerCase();
-      return __indexOf.call(xs, x) >= 0;
-    };
-    return Recipes.Search._search(match, q);
-  };
-
-  Recipes.Search.onTagSelect = function(tag) {
-    var match;
-    match = function(x, node) {
+  Recipes.Search.filter = function() {
+    var hasQuery, hasTag, li, lis, query, tag, toShow, _i, _j, _len, _len2, _results;
+    query = Recipes.Search._query;
+    tag = Recipes.Search._tag;
+    lis = Recipes.Search._lis;
+    query = query.trim();
+    tag = tag !== '---' ? tag : '';
+    hasTag = function(x, node) {
       var n, nodes, xs;
       nodes = node.querySelectorAll('.tags li');
       xs = (function() {
@@ -88,34 +89,55 @@
       })();
       return __indexOf.call(xs, x) >= 0;
     };
-    if (tag === '---') tag = '';
-    return Recipes.Search._search(match, tag);
-  };
-
-  Recipes.Search._search = function(match, q) {
-    var li, lis, toHide, _i, _j, _len, _len2;
-    q = q.trim();
-    lis = Recipes.Search.lis;
+    hasQuery = function(x, node) {
+      var xs;
+      xs = (node.querySelector('p')).textContent.toLowerCase();
+      return (xs.indexOf(x)) >= 0;
+    };
     for (_i = 0, _len = lis.length; _i < _len; _i++) {
       li = lis[_i];
-      show(li);
+      hide(li);
     }
-    if (q) {
-      toHide = (function() {
+    if (tag) {
+      toShow = (function() {
         var _j, _len2, _results;
         _results = [];
         for (_j = 0, _len2 = lis.length; _j < _len2; _j++) {
           li = lis[_j];
-          if (!match(q, li)) _results.push(li);
+          if (hasTag(tag, li)) _results.push(li);
         }
         return _results;
       })();
-      for (_j = 0, _len2 = toHide.length; _j < _len2; _j++) {
-        li = toHide[_j];
-        hide(li);
+      if (query) {
+        toShow = (function() {
+          var _j, _len2, _results;
+          _results = [];
+          for (_j = 0, _len2 = toShow.length; _j < _len2; _j++) {
+            li = toShow[_j];
+            if (hasQuery(query, li)) _results.push(li);
+          }
+          return _results;
+        })();
       }
+    } else if (query) {
+      toShow = (function() {
+        var _j, _len2, _results;
+        _results = [];
+        for (_j = 0, _len2 = lis.length; _j < _len2; _j++) {
+          li = lis[_j];
+          if (hasQuery(query, li)) _results.push(li);
+        }
+        return _results;
+      })();
+    } else {
+      toShow = lis;
     }
-    return;
+    _results = [];
+    for (_j = 0, _len2 = toShow.length; _j < _len2; _j++) {
+      li = toShow[_j];
+      _results.push(show(li));
+    }
+    return _results;
   };
 
   show = function(x) {

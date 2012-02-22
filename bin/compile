@@ -61,6 +61,7 @@ make_index() {
             echo "  <li>${tag}</li>" >> "${src}"
         done
         echo "  </ul>" >> "${src}"
+        echo >> "${src}"
     done
     local content=$(markdown "${src}")
     template "./etc/index.html" "" "${content}" "${dst}"

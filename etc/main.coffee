@@ -3,7 +3,9 @@ Recipes = {}
 Recipes.Search = {}
 
 Recipes.Search.init = () ->
-    this.lis = document.querySelectorAll '.recipe-list li'
+    this._lis = document.querySelectorAll '.recipe-list > ul > li'
+    this._query = ''
+    this._tag = ''
     this.initSearchField()
     this.initTagsFilter()
     undefined
@@ -15,7 +17,10 @@ Recipes.Search.initSearchField = () ->
         if timerId isnt null
             clearTimeout timerId
             timerId = null
-        timerId = setTimeout Recipes.Search.onSearchQuery, 300, search.value
+        timerId = setTimeout () ->
+            Recipes.Search._query = search.value
+            Recipes.Search.filter()
+        , 300
     (search.addEventListener e, f for e in ['keyup', 'change', 'search'])
     undefined
 
@@ -38,31 +43,35 @@ Recipes.Search.initTagsFilter = () ->
         searchContainer.classList.remove 'max'
         show tagsContainer
     tagsSelect.addEventListener 'change', () ->
-        Recipes.Search.onTagSelect tagsSelect.value
+        Recipes.Search._tag = tagsSelect.value
+        Recipes.Search.filter()
     undefined
 
-Recipes.Search.onSearchQuery = (q) ->
-    match = (x, node) ->
-        xs = node.textContent.toLowerCase()
-        x in xs
-    Recipes.Search._search match, q
+Recipes.Search.filter = () ->
+    query = Recipes.Search._query
+    tag = Recipes.Search._tag
+    lis = Recipes.Search._lis
+    query = query.trim()
+    tag = if tag isnt '---' then tag else ''
 
-Recipes.Search.onTagSelect = (tag) ->
-    match = (x, node) ->
+    hasTag = (x, node) ->
         nodes = node.querySelectorAll '.tags li'
         xs = (n.textContent for n in nodes)
         x in xs
-    tag = '' if tag is '---'
-    Recipes.Search._search match, tag
+    hasQuery = (x, node) ->
+        xs = (node.querySelector 'p').textContent.toLowerCase()
+        (xs.indexOf x) >= 0
 
-Recipes.Search._search = (match, q) ->
-    q = q.trim()
-    lis = Recipes.Search.lis
-    show li for li in lis
-    if q
-        toHide = (li for li in lis when not match q, li)
-        hide li for li in toHide
-    undefined
+    hide li for li in lis
+    if tag
+        toShow = (li for li in lis when hasTag tag, li)
+        if query
+            toShow = (li for li in toShow when hasQuery query, li)
+    else if query
+        toShow = (li for li in lis when hasQuery query, li)
+    else
+        toShow = lis
+    show li for li in toShow
 
 
 show = (x) -> x.classList.remove 'hidden'
