@@ -4,6 +4,7 @@ test -f "./.recipes.txt" || (echo "Please run from recipes root directory"; exit
 
 paths=()
 titles=()
+alltags=()
 
 
 markdown() {
@@ -30,9 +31,11 @@ process_file() {
 
     local content=$(markdown "${src}")
     local title=$(echo "${content}" | grep '<h1>' | head -1 | sed -re 's|<h1>(.+)</h1>|\1|')
+    local tags=$(echo "${content}" | grep '<!-- Tags:' | head -1 | sed -re 's|<!-- Tags: (.+) -->|\1|')
 
-    paths=("${paths[@]}" "$dst")
-    titles=("${titles[@]}" "$title")
+    paths=("${paths[@]}" "${dst}")
+    titles=("${titles[@]}" "${title}")
+    alltags=("${alltags[@]}" "${tags}")
 
     template "./etc/recipe.html" "${title}" "${content}" "${dst}"
 }
@@ -50,8 +53,14 @@ make_index() {
     for (( i = 0; i < len; i++ )); do
         local path=${paths[$i]/.\/var\//}
         local title=${titles[$i]}
-        local item="* [${title}](${path})"
-        echo "${item}" >> "${src}"
+        local tagsString=${alltags[$i]}
+        local tags=("$(echo $tagsString | tr ',' '\n')")
+        echo "* [${title}](${path})" >> "${src}"
+        echo "  <ul class=\"tags\">" >> "${src}"
+        for tag in $tags; do
+            echo "  <li>${tag}</li>" >> "${src}"
+        done
+        echo "  </ul>" >> "${src}"
     done
     local content=$(markdown "${src}")
     template "./etc/index.html" "" "${content}" "${dst}"
