@@ -11,6 +11,10 @@ $sideWidth: 200px
     -moz-transition: $x
     -ms-transition: $x
     transition: $x
+@mixin column-count($x)
+    -webkit-column-count: $x
+    -moz-column-count: $x
+    column-count: $x
 
 @mixin block()
     background: #fff
@@ -148,6 +152,8 @@ a
         padding: 0
         border: none
         width: 100%
+    .recipe-list
+        @include column-count(2)
     .recipe
         h1, h2, h3, h4, h5, h6
             border: none
