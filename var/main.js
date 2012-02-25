@@ -15,8 +15,13 @@
     return;
   };
 
+  Recipes.Search.setQuery = function(x, defer) {
+    this._query = x ? x.trim() : null;
+    if (!defer) return Recipes.Search.filter();
+  };
+
   Recipes.Search.setCategory = function(x, defer) {
-    this._category = x;
+    this._category = x ? x.trim() : null;
     if (!defer) return Recipes.Search.filter();
   };
 
@@ -39,8 +44,7 @@
         timerId = null;
       }
       return timerId = setTimeout(function() {
-        Recipes.Search._query = search.value;
-        return Recipes.Search.filter();
+        return Recipes.Search.setQuery(search.value);
       }, 300);
     };
     _ref = ['keyup', 'change', 'search'];
@@ -56,7 +60,6 @@
     query = Recipes.Search._query;
     category = Recipes.Search._category;
     lis = Recipes.Search._lis;
-    query = query.trim();
     hasCategory = function(x, node) {
       var n, nodes, xs;
       nodes = node.querySelectorAll('.categories li');

@@ -10,10 +10,13 @@ Recipes.Search.init = () ->
     this.initSearchField()
     undefined
 
+Recipes.Search.setQuery = (x, defer) ->
+    this._query = if x then x.trim() else null
+    Recipes.Search.filter() if not defer
+
 Recipes.Search.setCategory = (x, defer) ->
-    this._category = x
-    if not defer
-        Recipes.Search.filter()
+    this._category = if x then x.trim() else null
+    Recipes.Search.filter() if not defer
 
 Recipes.Search.disableSubmit = () ->
     form = document.querySelector 'form.search'
@@ -30,8 +33,7 @@ Recipes.Search.initSearchField = () ->
             clearTimeout timerId
             timerId = null
         timerId = setTimeout () ->
-            Recipes.Search._query = search.value
-            Recipes.Search.filter()
+            Recipes.Search.setQuery search.value
         , 300
     (search.addEventListener e, f for e in ['keyup', 'change', 'search'])
     undefined
@@ -40,7 +42,6 @@ Recipes.Search.filter = () ->
     query = Recipes.Search._query
     category = Recipes.Search._category
     lis = Recipes.Search._lis
-    query = query.trim()
 
     hasCategory = (x, node) ->
         nodes = node.querySelectorAll '.categories li'
