@@ -10,6 +10,7 @@
     this._lis = document.querySelectorAll('.recipe-list > ul > li');
     this._query = '';
     this._category = '';
+    this.disableSubmit();
     this.initSearchField();
     return;
   };
@@ -17,6 +18,15 @@
   Recipes.Search.setCategory = function(x, defer) {
     this._category = x;
     if (!defer) return Recipes.Search.filter();
+  };
+
+  Recipes.Search.disableSubmit = function() {
+    var form;
+    form = document.querySelector('form.search');
+    form.addEventListener('submit', function(event) {
+      return event.preventDefault();
+    });
+    return;
   };
 
   Recipes.Search.initSearchField = function() {

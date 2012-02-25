@@ -6,6 +6,7 @@ Recipes.Search.init = () ->
     this._lis = document.querySelectorAll '.recipe-list > ul > li'
     this._query = ''
     this._category = ''
+    this.disableSubmit()
     this.initSearchField()
     undefined
 
@@ -13,6 +14,13 @@ Recipes.Search.setCategory = (x, defer) ->
     this._category = x
     if not defer
         Recipes.Search.filter()
+
+Recipes.Search.disableSubmit = () ->
+    form = document.querySelector 'form.search'
+    form.addEventListener 'submit', (event) ->
+        event.preventDefault()
+    undefined
+
 
 Recipes.Search.initSearchField = () ->
     timerId = null
