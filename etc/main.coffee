@@ -5,10 +5,14 @@ Recipes.Search = {}
 Recipes.Search.init = () ->
     this._lis = document.querySelectorAll '.recipe-list > ul > li'
     this._query = ''
-    this._tag = ''
+    this._category = ''
     this.initSearchField()
-    this.initTagsFilter()
     undefined
+
+Recipes.Search.setCategory = (x, defer) ->
+    this._category = x
+    if not defer
+        Recipes.Search.filter()
 
 Recipes.Search.initSearchField = () ->
     timerId = null
@@ -24,38 +28,14 @@ Recipes.Search.initSearchField = () ->
     (search.addEventListener e, f for e in ['keyup', 'change', 'search'])
     undefined
 
-Recipes.Search.initTagsFilter = () ->
-    tags = []
-    tagNodes = document.querySelectorAll '.recipe-list .tags li'
-    for x in tagNodes
-        tag = x.textContent
-        tags.push tag if tag not in tags
-    if tags.length
-        tags = tags.sort()
-        searchContainer = document.querySelector 'form.search .query'
-        tagsContainer = document.querySelector 'form.search .tags'
-        tagsSelect = tagsContainer.querySelector 'select'
-        for x in tags
-            node = document.createElement 'option'
-            node.value = x
-            node.text = x
-            tagsSelect.appendChild node
-        searchContainer.classList.remove 'max'
-        show tagsContainer
-    tagsSelect.addEventListener 'change', () ->
-        Recipes.Search._tag = tagsSelect.value
-        Recipes.Search.filter()
-    undefined
-
 Recipes.Search.filter = () ->
     query = Recipes.Search._query
-    tag = Recipes.Search._tag
+    category = Recipes.Search._category
     lis = Recipes.Search._lis
     query = query.trim()
-    tag = if tag isnt '---' then tag else ''
 
-    hasTag = (x, node) ->
-        nodes = node.querySelectorAll '.tags li'
+    hasCategory = (x, node) ->
+        nodes = node.querySelectorAll '.categories li'
         xs = (n.textContent for n in nodes)
         x in xs
     hasQuery = (x, node) ->
@@ -63,8 +43,8 @@ Recipes.Search.filter = () ->
         (xs.indexOf x) >= 0
 
     hide li for li in lis
-    if tag
-        toShow = (li for li in lis when hasTag tag, li)
+    if category
+        toShow = (li for li in lis when hasCategory category, li)
         if query
             toShow = (li for li in toShow when hasQuery query, li)
     else if query
@@ -77,7 +57,33 @@ Recipes.Search.filter = () ->
 Recipes.Menu = {}
 
 Recipes.Menu.init = () ->
-    sidebar = document.querySelector '.sidebar'
+    this._sidebar = document.querySelector '.sidebar'
+    this._list = this._sidebar.querySelector '.category-list'
+    hasSome = this.populate()
+    if hasSome
+        show this._sidebar
+        this.initOnScroll()
+        this.bindEvents()
+
+Recipes.Menu.populate = () ->
+    list = this._list
+    categories = []
+    nodes = document.querySelectorAll '.recipe-list .categories li'
+    for x in nodes
+        category = x.textContent
+        categories.push category if category not in categories
+    if categories.length
+        categories = categories.sort()
+        for x in categories
+            node = document.createElement 'li'
+            node.innerHTML = '<a href="#">' + x + '</a>'
+            list.appendChild node
+        true
+    else
+        false
+
+Recipes.Menu.initOnScroll = () ->
+    sidebar = this._sidebar
     sidebarTop = sidebar.offsetTop + sidebar.parentNode.offsetTop
     sidebarLeftOld = sidebar.offsetLeft
     sidebarLeft = sidebarLeftOld + sidebar.parentNode.offsetLeft
@@ -97,6 +103,30 @@ Recipes.Menu.init = () ->
 
     window.addEventListener 'scroll', onScroll
     onScroll()
+    undefined
+
+Recipes.Menu.bindEvents = () ->
+    bind = (a) ->
+        a.addEventListener 'click', (event) ->
+            event.preventDefault()
+            a = this
+            li = this.parentNode
+            ul = li.parentNode
+            n.classList.remove 'active' for n in ul.children
+            li.classList.add 'active'
+            if a.classList.contains 'all'
+                Recipes.Menu.resetCategory()
+            else
+                Recipes.Menu.setCategory a.textContent
+            undefined
+    bind a for a in this._list.querySelectorAll 'a'
+    undefined
+
+Recipes.Menu.resetCategory = () ->
+    Recipes.Menu.setCategory null
+
+Recipes.Menu.setCategory = (x) ->
+    Recipes.Search.setCategory x
 
 
 show = (x) -> x.classList.remove 'hidden'

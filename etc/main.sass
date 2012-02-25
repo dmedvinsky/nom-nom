@@ -91,27 +91,26 @@ a
         position: fixed
         top: 0
 
-.site-nav
-    > ul
-        list-style: none
+.category-list
+    list-style: none
+    margin: 0
+    padding: 0
+    > li
         margin: 0
-        padding: 0
-        > li
-            margin: 0
+        a
+            display: block
+            padding: 5px 10px
+            &:hover
+                background: rgba(0, 0, 0, .1)
+        &.active
             a
-                display: block
-                padding: 5px 10px
-                &:hover
-                    background: rgba(0, 0, 0, .1)
-            &.active
-                a
-                    background: rgba(144, 238, 144, .5)
+                background: rgba(144, 238, 144, .5)
 
 .recipe-list
     @include main-block()
     p
         margin: 0
-    .tags
+    .categories
         display: none
 
 .recipe

@@ -16,4 +16,4 @@ Steps
 
 After that is done, you better run.
 
-<!-- Tags: beer, tasty -->
+<!-- Categories: beer, tasty -->
