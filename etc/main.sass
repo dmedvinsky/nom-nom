@@ -53,12 +53,6 @@ a
 
 .site-search
     @include main-block()
-    ul
-        list-style: none
-        margin: 0
-        li
-            display: inline-block
-            line-height: 50px
     form
         margin: 0
         padding: 0
@@ -112,6 +106,13 @@ a
         margin: 0
     .categories
         display: none
+
+.back-link
+    @include main-block()
+    a
+        display: block
+        padding: 10px
+        text-align: center
 
 .recipe
     @include main-block()
