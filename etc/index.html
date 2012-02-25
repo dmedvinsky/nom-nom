@@ -11,21 +11,32 @@
       <h1>Recipes</h1>
     </header>
 
-    <nav class="site-nav">
+    <nav class="site-search">
       <form class="search" method="get" action="." id="id-search-form">
         <fieldset class="query max">
           <input type="search" placeholder="Search">
         </fieldset>
-        <fieldset class="tags hidden">
-          <select><option value="">---</option></select>
-        </fieldset>
       </form>
     </nav>
 
-    <section class="recipe-list">
-      {{ content }}
-    </section>
+    <div class="wrapper">
+      <aside class="sidebar">
+        <nav class="site-nav">
+          <ul>
+            <li class="active"><a href="#">All</a></li>
+            <li><a href="#beer">Beer</a></li>
+          </ul>
+        </nav>
+      </aside>
 
-    <script>Recipes.Search.init();</script>
+      <section class="recipe-list">
+        {{ content }}
+      </section>
+    </div>
+
+    <script>
+      Recipes.Menu.init();
+      Recipes.Search.init();
+    </script>
   </body>
 </html>

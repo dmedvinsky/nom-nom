@@ -140,6 +140,33 @@
     return _results;
   };
 
+  Recipes.Menu = {};
+
+  Recipes.Menu.init = function() {
+    var isFixed, onScroll, sidebar, sidebarLeft, sidebarLeftOld, sidebarTop;
+    sidebar = document.querySelector('.sidebar');
+    sidebarTop = sidebar.offsetTop + sidebar.parentNode.offsetTop;
+    sidebarLeftOld = sidebar.offsetLeft;
+    sidebarLeft = sidebarLeftOld + sidebar.parentNode.offsetLeft;
+    isFixed = 0;
+    onScroll = function() {
+      var scrollTop;
+      scrollTop = window.pageYOffset;
+      if (scrollTop >= sidebarTop && !isFixed) {
+        isFixed = 1;
+        sidebar.style.left = sidebarLeft + 'px';
+        sidebar.classList.add('fixed');
+      } else if (scrollTop <= sidebarTop && isFixed) {
+        isFixed = 0;
+        sidebar.style.left = sidebarLeftOld + 'px';
+        sidebar.classList.remove('fixed');
+      }
+      return;
+    };
+    window.addEventListener('scroll', onScroll);
+    return onScroll();
+  };
+
   show = function(x) {
     return x.classList.remove('hidden');
   };

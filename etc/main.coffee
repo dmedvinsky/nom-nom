@@ -74,6 +74,31 @@ Recipes.Search.filter = () ->
     show li for li in toShow
 
 
+Recipes.Menu = {}
+
+Recipes.Menu.init = () ->
+    sidebar = document.querySelector '.sidebar'
+    sidebarTop = sidebar.offsetTop + sidebar.parentNode.offsetTop
+    sidebarLeftOld = sidebar.offsetLeft
+    sidebarLeft = sidebarLeftOld + sidebar.parentNode.offsetLeft
+    isFixed = 0
+
+    onScroll = () ->
+        scrollTop = window.pageYOffset
+        if scrollTop >= sidebarTop && !isFixed
+            isFixed = 1
+            sidebar.style.left = sidebarLeft + 'px'
+            sidebar.classList.add 'fixed'
+        else if scrollTop <= sidebarTop && isFixed
+            isFixed = 0
+            sidebar.style.left = sidebarLeftOld + 'px'
+            sidebar.classList.remove 'fixed'
+        undefined
+
+    window.addEventListener 'scroll', onScroll
+    onScroll()
+
+
 show = (x) -> x.classList.remove 'hidden'
 hide = (x) -> x.classList.add 'hidden'
 
