@@ -6,6 +6,9 @@ g_paths=()
 g_titles=()
 g_categories=()
 
+trim() {
+    echo $1;
+}
 
 markdown() {
     ./lib/markdown.pl "$@"
@@ -53,11 +56,12 @@ make_index() {
     for (( i = 0; i < len; i++ )); do
         local path=${g_paths[$i]/.\/var\//}
         local title=${g_titles[$i]}
-        local categories=("$(echo ${g_categories[$i]} | tr ',' '\n')")
+        local categories=
+        IFS="," read -ra categories <<< "${g_categories[$i]}"
         echo "* [${title}](${path})" >> "${src}"
         echo "  <ul class=\"categories\">" >> "${src}"
-        for category in $categories; do
-            echo "  <li>${category}</li>" >> "${src}"
+        for category in "${categories[@]}"; do
+            echo "  <li>$(trim "${category}")</li>" >> "${src}"
         done
         echo "  </ul>" >> "${src}"
         echo >> "${src}"
